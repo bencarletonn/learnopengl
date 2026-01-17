@@ -26,5 +26,10 @@ target_link_directories(scene PRIVATE
 target_link_libraries(scene PRIVATE	
 	glad
 	glfw3
+  "-framework Cocoa"
+	"-framework IOKit"
+	"-framework CoreFoundation"
+	"-framework CoreVideo"
+  "-framework QuartzCore"
 	"-framework OpenGL"
 )
