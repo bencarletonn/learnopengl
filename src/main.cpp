@@ -90,6 +90,9 @@ int main() {
   glDeleteShader(vertexShader);
   glDeleteShader(fragmentShader);
 
+  // Enable wireframe mode
+  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
   float vertices[] = {
      0.5f,  0.5f, 0.0f, // top right
      0.5f, -0.5f, 0.0f, // bottom right
