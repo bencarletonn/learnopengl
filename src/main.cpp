@@ -6,16 +6,9 @@
 const unsigned int SRC_WIDTH = 800;
 const unsigned int SRC_HEIGHT = 600;
 
-void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
-  // Set the viewport dimensions
-  glViewport(0, 0, width, height);
-}
+void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
-void processInput(GLFWwindow *window) {
-  if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-    glfwSetWindowShouldClose(window, true);
-  }
-}
+void processInput(GLFWwindow *window);
 
 const char *vertexShaderSource = 
     "#version 330 core\n"
@@ -148,4 +141,15 @@ int main() {
 
   glfwTerminate();
   return 0;
+}
+
+void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
+  // Set the viewport dimensions
+  glViewport(0, 0, width, height);
+}
+
+void processInput(GLFWwindow *window) {
+  if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+    glfwSetWindowShouldClose(window, true);
+  }
 }
