@@ -1,3 +1,5 @@
+add_subdirectory(shaders)
+
 add_executable(scene)
 
 target_sources(scene PRIVATE
@@ -14,6 +16,7 @@ target_link_directories(scene PRIVATE
 )
 
 target_link_libraries(scene PRIVATE
+  shaders
   glad
   glfw3
   "-framework Cocoa"
