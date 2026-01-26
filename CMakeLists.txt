@@ -8,3 +8,9 @@ set(LOCAL_PREFIX "$ENV{HOME}/.local")
 
 add_subdirectory(external)
 add_subdirectory(src)
+
+add_custom_target(copy_assets ALL
+  COMMAND ${CMAKE_COMMAND} -E copy_directory
+          ${CMAKE_SOURCE_DIR}/assets
+          ${CMAKE_BINARY_DIR}/assets
+)
