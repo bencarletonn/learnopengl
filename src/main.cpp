@@ -45,10 +45,10 @@ int main() {
   //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
   float vertices[] = {
-    // positions         // colors
-     0.0f,  0.5f, 0.0f,  1.0f, 0.0f, 0.0f,
-    -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,
-     0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,
+    // positions
+     0.0f,  0.5f, 0.0f,
+    -0.5f, -0.5f, 0.0f,
+     0.5f, -0.5f, 0.0f,
   };
 
   unsigned int indices[] = {
@@ -70,11 +70,8 @@ int main() {
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
   // set the vertex attributes pointers
   // position attribute
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
   glEnableVertexAttribArray(0);
-  // color attribute 
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-  glEnableVertexAttribArray(1);
 
   // unbind the VBO, call to glVertexAttribPointer has already registered VBO as
   // the vertex attribute's bound vertex buffer object
@@ -93,8 +90,6 @@ int main() {
     glClear(GL_COLOR_BUFFER_BIT);
 
     ourShader.use();
-    ourShader.setFloat("someUniform", 1.0f);
-
     // draw the object
     // update the unform color in the fragment shader
     //float timeValue = glfwGetTime();
