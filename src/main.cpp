@@ -93,7 +93,7 @@ int main() {
     glClear(GL_COLOR_BUFFER_BIT);
 
     ourShader.use();
-    ourShader.setFloat("someUniform", 1.0f);
+    ourShader.setFloat("horizontalOffset", 0.5f);
 
     // draw the object
     // update the unform color in the fragment shader
