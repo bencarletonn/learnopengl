@@ -19,6 +19,7 @@ target_link_libraries(scene PRIVATE
   shaders
   glad
   glfw3
+  stb
   "-framework Cocoa"
   "-framework IOKit"
   "-framework CoreFoundation"
