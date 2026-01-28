@@ -45,32 +45,6 @@ int main() {
   // Enable wireframe mode
   // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-  // Generating the texture
-  unsigned int texture;
-  glGenTextures(1, &texture);
-  glBindTexture(GL_TEXTURE_2D, texture);
-  // set thr texture wrapping/filtering options (on the current bound texture
-  // object)
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                  GL_LINEAR_MIPMAP_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-  // Load the texture
-  int width, height, nrChannels;
-  unsigned char *data = stbi_load("assets/textures/container.jpg", &width,
-                                  &height, &nrChannels, 0);
-  if (data) {
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
-                 GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-  } else {
-    std::cout << "Failed to load texture" << std::endl;
-  }
-
-  stbi_image_free(data);
-
   float vertices[] = {
     // positions         // colors          // texture coords
      0.5f,  0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  1.0f, 1.0f, // top right
@@ -115,6 +89,63 @@ int main() {
   // unbind the VAO
   glBindVertexArray(0);
 
+  // Generating the textures
+  unsigned int texture1, texture2;
+
+  // texture 1
+  // glActiveTexture(GL_TEXTURE0); // this is , not needed
+  glGenTextures(1, &texture1);
+  glBindTexture(GL_TEXTURE_2D, texture1);
+  // set thr texture wrapping/filtering options (on the current bound texture
+  // object)
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                  GL_LINEAR_MIPMAP_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+  // Load the texture
+  int width, height, nrChannels;
+  unsigned char *data = stbi_load("assets/textures/container.jpg", &width,
+                                  &height, &nrChannels, 0);
+  if (data) {
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+                 GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+  } else {
+    std::cout << "Failed to load texture" << std::endl;
+  }
+  stbi_image_free(data);
+
+  // texture 2
+  glGenTextures(1, &texture2);
+  glBindTexture(GL_TEXTURE_2D, texture2); // default texture unit is 0
+  // set thr texture wrapping/filtering options (on the current bound texture
+  // object)
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                  GL_LINEAR_MIPMAP_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+  // Load the texture
+  stbi_set_flip_vertically_on_load(true);
+  data = stbi_load("assets/textures/awesomeface.png", &width, &height,
+                   &nrChannels, 0);
+  if (data) {
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, // GL_RGBA, png contains ALPHA
+                 GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+  } else {
+    std::cout << "Failed to load texture" << std::endl;
+  }
+  stbi_image_free(data);
+
+  ourShader.use(); // Need to activate/use shader before setting uniforms
+  glUniform1i(glGetUniformLocation(ourShader.ID, "texture1"), 0);
+  // or set via shader class
+  ourShader.setInt("texture2", 1);
+
   // render loop
   while (!glfwWindowShouldClose(window)) {
     // input
@@ -124,22 +155,19 @@ int main() {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
+    // bind textures/reassign from both texture unit 0 to corresponding texture units
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture1);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, texture2);
+
+    // render the container 
     ourShader.use();
-    //ourShader.setFloat("someUniform", 1.0f);
-
-    // draw the object
-    // update the unform color in the fragment shader
-    //float timeValue = glfwGetTime();
-    //float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
-    //int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
-    //glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
-
-    // render the triangle
-    glBindTexture(GL_TEXTURE_2D, texture);
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 
+    // swap buffers and poll IO events
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
@@ -147,6 +175,7 @@ int main() {
   // optional, de-allocate resources
   glDeleteVertexArrays(1, &VAO);
   glDeleteBuffers(1, &VBO);
+  glDeleteBuffers(1, &EBO);
 
   glfwTerminate();
   return 0;
