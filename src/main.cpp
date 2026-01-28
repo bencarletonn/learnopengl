@@ -129,7 +129,6 @@ int main() {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
   // Load the texture
-  stbi_set_flip_vertically_on_load(true);
   data = stbi_load("assets/textures/awesomeface.png", &width, &height,
                    &nrChannels, 0);
   if (data) {
