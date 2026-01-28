@@ -1,6 +1,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <learnopengl/shaders.h>
+#include <stb/stb_image.h>
 
 #include <iostream>
 
@@ -42,17 +43,45 @@ int main() {
   Shader ourShader(VERTEX_PATH.c_str(), SHADER_PATH.c_str());
 
   // Enable wireframe mode
-  //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+  // Generating the texture
+  unsigned int texture;
+  glGenTextures(1, &texture);
+  glBindTexture(GL_TEXTURE_2D, texture);
+  // set thr texture wrapping/filtering options (on the current bound texture
+  // object)
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                  GL_LINEAR_MIPMAP_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+  // Load the texture
+  int width, height, nrChannels;
+  unsigned char *data = stbi_load("assets/textures/container.jpg", &width,
+                                  &height, &nrChannels, 0);
+  if (data) {
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+                 GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+  } else {
+    std::cout << "Failed to load texture" << std::endl;
+  }
+
+  stbi_image_free(data);
 
   float vertices[] = {
-    // positions         // colors
-     0.0f,  0.5f, 0.0f,  1.0f, 0.0f, 0.0f,
-    -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,
-     0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,
+    // positions         // colors          // texture coords
+     0.5f,  0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  1.0f, 1.0f, // top right
+     0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f, // bottom right
+    -0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f, // bottom left
+    -0.5f,  0.5f, 0.0f,  1.0f, 1.0f, 0.0f,  0.0f, 1.0f, // top left
   };
 
   unsigned int indices[] = {
-    0, 1, 2, // first triangle
+    0, 1, 2,  // first rectange
+    0, 2, 3,  // second triangle
   };
 
   unsigned int VAO, VBO, EBO;
@@ -70,11 +99,14 @@ int main() {
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
   // set the vertex attributes pointers
   // position attribute
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
   glEnableVertexAttribArray(0);
   // color attribute 
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
   glEnableVertexAttribArray(1);
+  // tezture attribute
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+  glEnableVertexAttribArray(2);
 
   // unbind the VBO, call to glVertexAttribPointer has already registered VBO as
   // the vertex attribute's bound vertex buffer object
@@ -93,7 +125,7 @@ int main() {
     glClear(GL_COLOR_BUFFER_BIT);
 
     ourShader.use();
-    ourShader.setFloat("someUniform", 1.0f);
+    //ourShader.setFloat("someUniform", 1.0f);
 
     // draw the object
     // update the unform color in the fragment shader
@@ -103,6 +135,7 @@ int main() {
     //glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
 
     // render the triangle
+    glBindTexture(GL_TEXTURE_2D, texture);
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
