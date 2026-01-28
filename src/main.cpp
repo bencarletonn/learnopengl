@@ -80,8 +80,8 @@ int main() {
   };
 
   unsigned int indices[] = {
-    0, 1, 2,  // first rectange
-    0, 2, 3,  // second triangle
+    0, 1, 3,  // first rectange
+    1, 2, 3,  // second triangle
   };
 
   unsigned int VAO, VBO, EBO;
