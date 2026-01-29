@@ -4,9 +4,12 @@
 #include <stb/stb_image.h>
 
 #include <iostream>
+#include <algorithm>
 
 const unsigned int SRC_WIDTH = 800;
 const unsigned int SRC_HEIGHT = 600;
+
+float opacity = 0.2f;
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
@@ -161,6 +164,9 @@ int main() {
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, texture2);
 
+    // set the texture opacity/mix
+    ourShader.setFloat("smileyFaceOpacity", opacity);
+
     // render the container 
     ourShader.use();
     glBindVertexArray(VAO);
@@ -189,5 +195,11 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 void processInput(GLFWwindow *window) {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
     glfwSetWindowShouldClose(window, true);
+  }
+  if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+    opacity = std::min(1.0f, opacity + 0.005f);
+  }
+  if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+    opacity = std::max(0.0f, opacity - 0.005f);
   }
 }
