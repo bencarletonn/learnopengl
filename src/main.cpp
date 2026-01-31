@@ -165,17 +165,28 @@ int main() {
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, texture2);
 
-    // create a translation matrix 
-    glm::mat4 trans = glm::mat4(1.0f);
-    trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
-    trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-    unsigned int transformLoc = glGetUniformLocation(ourShader.ID, "transform");
-    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
-
     // render the container 
     ourShader.use();
     glBindVertexArray(VAO);
+
+    // create a translation matrix array
+    glm::mat4 trans[2] = {glm::mat4(1.0f), glm::mat4(1.0f)};
+    float currTime = (float)glfwGetTime();
+
+    // first translation matrix
+    trans[0] = glm::translate(trans[0], glm::vec3(0.5f, -0.5f, 0.0f));
+    trans[0] = glm::rotate(trans[0], currTime, glm::vec3(0.0f, 0.0f, 1.0f));
+    unsigned int transformLoc = glGetUniformLocation(ourShader.ID, "transform");
+    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans[0]));
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+    // create a new translation matrix to apply on a new set of duplicate vertices
+    trans[1] = glm::mat4(1.0f);
+    trans[1] = glm::translate(trans[1], glm::vec3(-0.5f, 0.5f, 0.0f));
+    trans[1] = glm::scale(trans[1], glm::vec3(glm::sin(currTime), glm::sin(currTime), 1.0f));
+    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans[1]));
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
     glBindVertexArray(0);
 
     // swap buffers and poll IO events
