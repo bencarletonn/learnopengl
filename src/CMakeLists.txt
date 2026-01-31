@@ -20,6 +20,7 @@ target_link_libraries(scene PRIVATE
   glad
   glfw3
   stb
+  glm
   "-framework Cocoa"
   "-framework IOKit"
   "-framework CoreFoundation"
