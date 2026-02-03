@@ -227,6 +227,13 @@ int main() {
       float angle = 20.0f * i;
       model = glm::rotate(model, glm::radians(angle),
                           glm::vec3(1.0f, 0.3f, 0.5f));
+
+      if (int j = i + 1; j % 3 == 0) {
+        float angle = (float)glfwGetTime()* 50;
+        model = glm::rotate(model, glm::radians(angle),
+                            glm::vec3(1.0f, 0.3f, 0.5f));
+      }
+
       ourShader.setMat4("model", model);
 
       glDrawArrays(GL_TRIANGLES, 0, 36);
