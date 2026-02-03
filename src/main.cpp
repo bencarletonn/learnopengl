@@ -1,4 +1,3 @@
-#include "glm/ext/matrix_transform.hpp"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <stb/stb_image.h>
@@ -217,7 +216,7 @@ int main() {
     glm::mat4 projection = glm::mat4(1.0f);
     view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
     projection =
-        glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+        glm::perspective(glm::radians(45.0f), (float)SRC_WIDTH / SRC_HEIGHT, 0.1f, 100.0f);
     ourShader.setMat4("view", view);
     ourShader.setMat4("projection", projection);
 
