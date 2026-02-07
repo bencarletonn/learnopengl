@@ -236,17 +236,16 @@ int main() {
     // 1) we need world -> camera, so take the transpose
     // 2) we need -trans since we need to move WORLD so camera needs to end up at origin
     // GLM does this for us, we specify the camera position, the target, and the up vector
-    glm::mat4 view = glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f),
+    // create a view matrix (world space -> view space)
+    const float radius = 10.0f;
+    float camX = sin(glfwGetTime()) * radius;
+    float camZ = cos(glfwGetTime()) * radius;
+    glm::mat4 view = glm::lookAt(glm::vec3(camX, 0.0f, camZ),
                                  glm::vec3(0.0f, 0.0f, 0.0f),
                                  glm::vec3(0.0f, 1.0f, 0.0f));
 
-
-    // create transformations
-    // create a view matrix (world space -> view space)
-    //glm::mat4 view = glm::mat4(1.0f);
     // create a projection matrix (view space -> clip space)
     glm::mat4 projection = glm::mat4(1.0f);
-    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
     projection =
         glm::perspective(glm::radians(45.0f), (float)SRC_WIDTH / SRC_HEIGHT, 0.1f, 100.0f);
     ourShader.setMat4("view", view);
