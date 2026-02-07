@@ -1,4 +1,3 @@
-#include "glm/geometric.hpp"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <stb/stb_image.h>
@@ -11,6 +10,10 @@
 
 const unsigned int SRC_WIDTH = 800;
 const unsigned int SRC_HEIGHT = 600;
+
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
@@ -210,39 +213,8 @@ int main() {
     ourShader.use();
     glBindVertexArray(VAO);
 
-    // Camera
-    // We need 3 vectors that define the cameras coordinate system, which we can use
-    // to form the view matrix (z, x, y)
-    // 1) Z axis
-    // Camera position
-    glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-    // Camera direction
-    glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-    glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
-    // i.e. - (cameraTarget - cameraPos) since we want vector of camera pointing to target
-    //                                   BUT we negate since camera points in direction of
-    //                                   -z on z axis (remember +z is coming towards screen)
-    // 2) Right axis (x)
-    // "up" in world space can be considered the same in view space.
-    // cross products gives us perpendicular vector
-    glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-    glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
-    // 3) Up axis (y)
-    glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
-
-    // These vectors represent where the basis vectors of the new space (camera)
-    // point in the old space (world), i.e. how the view basis is transformed 
-    // into world space, so maps camera -> world
-    // 1) we need world -> camera, so take the transpose
-    // 2) we need -trans since we need to move WORLD so camera needs to end up at origin
-    // GLM does this for us, we specify the camera position, the target, and the up vector
     // create a view matrix (world space -> view space)
-    const float radius = 10.0f;
-    float camX = sin(glfwGetTime()) * radius;
-    float camZ = cos(glfwGetTime()) * radius;
-    glm::mat4 view = glm::lookAt(glm::vec3(camX, 0.0f, camZ),
-                                 glm::vec3(0.0f, 0.0f, 0.0f),
-                                 glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
     // create a projection matrix (view space -> clip space)
     glm::mat4 projection = glm::mat4(1.0f);
@@ -284,7 +256,20 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 }
 
 void processInput(GLFWwindow *window) {
+  const float cameraSpeed = 0.05;
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
     glfwSetWindowShouldClose(window, true);
+  }
+  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+    cameraPos -= cameraSpeed * cameraFront;
+  }
+  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+    cameraPos += cameraSpeed * cameraFront;
+  }
+  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+    cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+  }
+  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+    cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
   }
 }
