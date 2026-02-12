@@ -15,10 +15,19 @@ glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
+// Camera related variables
+bool firstMouse = true;
+float lastX = SRC_WIDTH / 2.0f;
+float lastY = SRC_HEIGHT / 2.0f;
+float yaw = -90.f;
+float pitch = 0.0f;
+
 float deltaTime = 0.0f; // Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 
 void processInput(GLFWwindow *window);
 
@@ -41,6 +50,11 @@ int main() {
 
   // register callbacks
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+  // hide the cursoe and capture it (mouse camera movements, updating pitch + yaw)
+  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+  // call mouse_callback when the mouse moves
+  glfwSetCursorPosCallback(window, mouse_callback);
 
   // GLAD manages function ptrs for OpenGL, load OpenGL function ptrs for MacOS
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -271,6 +285,35 @@ int main() {
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
   // Set the viewport dimensions
   glViewport(0, 0, width, height);
+}
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
+  if (firstMouse) {
+    lastX = xpos;
+    lastY = ypos;
+    firstMouse = false;
+  }
+
+  float xoffset = xpos - lastX;
+  float yoffset = lastY - ypos;
+  lastX = xpos;
+  lastY = ypos;
+
+  float sensitivity = 0.1f;
+  xoffset *= sensitivity;
+  yoffset *= sensitivity;
+
+  yaw += xoffset;
+  pitch += yoffset;
+
+  pitch = std::min(pitch, 89.0f);
+  pitch = std::max(pitch, -89.0f);
+
+  glm::vec3 direction;
+  direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+  direction.y = sin(glm::radians(pitch));
+  direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+  cameraFront = glm::normalize(direction);
 }
 
 void processInput(GLFWwindow *window) {
