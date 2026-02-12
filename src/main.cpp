@@ -221,6 +221,16 @@ int main() {
     ourShader.use();
     glBindVertexArray(VAO);
 
+    // calculate direction vector using yaw & pitch
+    float yaw = -90.0f; // everything positioned in direction of negative z-axis
+                        // to make camera point towards the negative z axis, give
+                        // yaw a default value of 90 degree clockwise 
+    float pitch = 0.0f;
+    glm::vec3 direction;
+    direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+    direction.y = sin(glm::radians(pitch));
+    direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+
     // create a view matrix (world space -> view space)
     glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
