@@ -19,15 +19,19 @@ glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 bool firstMouse = true;
 float lastX = SRC_WIDTH / 2.0f;
 float lastY = SRC_HEIGHT / 2.0f;
-float yaw = -90.f;
+float yaw = -90.f; // clockwise 90, so we point to -z axis (i.e. way that camera points)
 float pitch = 0.0f;
 
 float deltaTime = 0.0f; // Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
 
+float fov = 45.0f;
+
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
+
+void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
 
 void processInput(GLFWwindow *window);
 
@@ -55,6 +59,7 @@ int main() {
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
   // call mouse_callback when the mouse moves
   glfwSetCursorPosCallback(window, mouse_callback);
+  glfwSetScrollCallback(window, scroll_callback);
 
   // GLAD manages function ptrs for OpenGL, load OpenGL function ptrs for MacOS
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -242,7 +247,7 @@ int main() {
     // create a projection matrix (view space -> clip space)
     glm::mat4 projection = glm::mat4(1.0f);
     projection =
-        glm::perspective(glm::radians(45.0f), (float)SRC_WIDTH / SRC_HEIGHT, 0.1f, 100.0f);
+        glm::perspective(glm::radians(fov), (float)SRC_WIDTH / SRC_HEIGHT, 0.1f, 100.0f);
     ourShader.setMat4("view", view);
     ourShader.setMat4("projection", projection);
 
@@ -305,6 +310,12 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
   direction.y = sin(glm::radians(pitch));
   direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
   cameraFront = glm::normalize(direction);
+}
+
+void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
+  fov -= (float)yoffset;
+  fov = std::max(fov, 1.0f);
+  fov = std::min(fov, 45.0f);
 }
 
 void processInput(GLFWwindow *window) {
