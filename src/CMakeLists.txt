@@ -1,4 +1,5 @@
 add_subdirectory(shaders)
+add_subdirectory(camera)
 
 add_executable(scene)
 
@@ -17,6 +18,7 @@ target_link_directories(scene PRIVATE
 
 target_link_libraries(scene PRIVATE
   shaders
+  camera
   glad
   glfw3
   stb
