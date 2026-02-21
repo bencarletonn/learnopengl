@@ -47,12 +47,11 @@ int main() {
 
   // register callbacks
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+  glfwSetCursorPosCallback(window, mouse_callback);
+  glfwSetScrollCallback(window, scroll_callback);
 
   // hide the cursoe and capture it (mouse camera movements, updating pitch + yaw)
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-  // call mouse_callback when the mouse moves
-  glfwSetCursorPosCallback(window, mouse_callback);
-  glfwSetScrollCallback(window, scroll_callback);
 
   // GLAD manages function ptrs for OpenGL, load OpenGL function ptrs for MacOS
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -257,10 +256,14 @@ void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
   if (firstMouse) {
     lastX = xpos;
     lastY = ypos;
+    firstMouse = false;
   }
 
   float xoffset = xpos - lastX;
-  float yoffset = ypos - lastY;
+  float yoffset = lastY - ypos;
+
+  lastX = xpos;
+  lastY = ypos;
 
   camera.ProcessMouseMovement(xoffset, yoffset);
 }
